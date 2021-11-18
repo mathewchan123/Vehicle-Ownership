@@ -1,5 +1,8 @@
+
+
 library(tidyverse)
 library(tidycensus)
+library(plyr)
 
 var = load_variables(2019,"acs5",cache=TRUE) 
 
@@ -29,6 +32,9 @@ cecil_df = df %>% dplyr::filter(NAME == "Cecil County, Maryland") %>%
 harford_df = df %>% dplyr::filter(NAME == "Harford County, Maryland") %>% 
   cbind(vars) %>% select(NAME, name, estimate, moe)
 
+baltimore_df = df %>% dplyr::filter(NAME == "Baltimore County, Maryland") %>% 
+  cbind(vars) %>% select(NAME, name, estimate, moe)
+
 ult_df = cecil_df %>% left_join(harford_df,by= "name")
 
 ult_df = ult_df %>% rename(
@@ -40,5 +46,31 @@ ult_df = ult_df %>% rename(
 
 ult_df = ult_df %>% mutate(diff = cecil_estimate - harford_estimate)
 
-ult_df %>% write_csv(file = "Harford_and_Cecil_County_Census_Data.csv")
+#ult_df %>% write_csv(file = "Harford_and_Cecil_County_Census_Data.csv")
 
+#combining the following:
+
+
+#Estimate!!Total:!!Car, truck, or van: 
+
+#Estimate!!Total:!!Public transportation (excluding taxicab):
+
+#Estimate!!Total:!!Worked from home
+
+#Estimate!!Total: (vehicles)
+
+#harford_dff = harford_df %>% select(-moe) %>% pivot_wider(names_from = "name", values_from = "estimate") %>% rbind(cecil_df %>% select(-c(moe, concept, label)) %>% pivot_wider(names_from = "name", values_from = "estimate"))
+
+#harford_df %>% select(-moe) %>% pivot_wider(names_from = "name", values_from = "estimate") %>% plyr::rbind.fill(cecil_df %>% select(-moe) %>% pivot_wider(names_from = "name", values_from = "estimate"))
+harford_dff = harford_df %>% select(-moe) %>% pivot_wider(names_from = "name", values_from = "estimate") %>% rbind(cecil_df %>% select(-c(moe, concept, label)) %>% pivot_wider(names_from = "name", values_from = "estimate")) %>% rbind(baltimore_df %>% select(-c(moe)) %>% pivot_wider(names_from = "name", values_from = "estimate"))
+
+
+model = lm(data = harford_dff, formula = B08203_001~ B08203_027)
+
+summary(model)
+
+#11-17
+#get data to be not messed up
+#pull in ALL counties
+#select features; in depth analysis; ask questions
+#add own features (for further future)

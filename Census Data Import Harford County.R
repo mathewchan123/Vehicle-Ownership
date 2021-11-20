@@ -5,6 +5,9 @@
 library(tidyverse)
 library(tidycensus)
 
+Sys.getenv("CENSUS_API_KEY") #census_api_key("CENSUS_API_KEY",install=TRUE)
+# census_api_key("CENSUS_API_KEY")
+
 #choose our variables
 var = load_variables(2019,"acs5",cache=TRUE) 
 
@@ -26,12 +29,11 @@ vars = var %>% dplyr::filter(grepl("B08006", name)) %>%
 
 #import Harford County
 
-census_api_key("bb637a985d9b9b2dcdf2ea179ed31ae79eb077b0")
-
-df = get_acs(geography="county", state = "MD",variables = vars %>% select(name) %>% unlist(),year=2019)
+df = get_acs(geography="county", state = "MD",variables = vars %>% select(name) %>% unlist() %>% unname(),year=2019,keep_geo_vars=TRUE)
 
 df2 = df %>% dplyr::filter(NAME == "Harford County, Maryland") %>% 
-  cbind(vars)
+  left_join(vars,by=c("variable"="name"))
+  #cbind(vars) - this method doesn't work because get_acs() may change the order on return
 
 df2 %>% write_csv(file = "Harford_County_Census_Data.csv")
 

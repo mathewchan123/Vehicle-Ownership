@@ -78,8 +78,6 @@ ggplot() +
   geom_point(aes(x=B08203_027,y=B08203_001),colour="red") +
   geom_line(data=,aes(x=B08203_027,y=predict),size=1,alpha=0.3,colour="blue") +
   theme_bw()
-plot(data=harford_dff,x=B08203_027,y=B08203_001)
-abline(model)
 
 #11-17
 #get data to be not messed up (done)

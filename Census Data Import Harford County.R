@@ -9,6 +9,8 @@ Sys.getenv("CENSUS_API_KEY") #census_api_key("CENSUS_API_KEY",install=TRUE)
 # census_api_key("CENSUS_API_KEY")
 
 #choose our variables
+Sys.getenv("CENSUS_API_KEY") #census_api_key("CENSUS_API_KEY",install=TRUE)
+
 var = load_variables(2019,"acs5",cache=TRUE) 
 
 #B08006_008 _ public transportation
@@ -33,7 +35,10 @@ df = get_acs(geography="county", state = "MD",variables = vars %>% select(name) 
 
 df2 = df %>% dplyr::filter(NAME == "Harford County, Maryland") %>% 
   left_join(vars,by=c("variable"="name"))
+<<<<<<< HEAD
+=======
   #cbind(vars) - this method doesn't work because get_acs() may change the order on return
+>>>>>>> b26dddb9a5f67f4ba1baa92864c438a3de1aa2cb
 
 df2 %>% write_csv(file = "Harford_County_Census_Data.csv")
 

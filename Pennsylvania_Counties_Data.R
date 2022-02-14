@@ -2,6 +2,7 @@ library(tidyverse)
 library(tidycensus)
 library(plyr)
 library(ggplot2)
+library(patchwork)
 
 #Retrieves census data through use of requested API key
 Sys.getenv("CENSUS_API_KEY") 
@@ -58,6 +59,7 @@ vars = var %>% dplyr::filter(grepl("B08006", name, label)) %>%
   rbind(var %>% dplyr::filter(grepl("B08303", name, label))) %>%
   rbind(var %>% dplyr::filter(grepl("B16001", name, label))) %>%
   rbind(var %>% dplyr::filter(grepl("B25024", name, label))) %>%
+  rbind(var %>% dplyr::filter(grepl("B19001", name, label))) %>%
   rbind(var %>% dplyr::filter(grepl("B01001", name, label))) 
 
 df = get_acs(geography="county", state = c("PA","MD"),variables = vars %>% select(name) %>% unlist() %>% unname(),year=2019,keep_geo_vars=TRUE)
@@ -98,16 +100,17 @@ all_county_df %>% dplyr::rename("Depart to work 6:00AM to 6:29AM" = "B08302_005"
 
 all_county_df %>% dplyr::rename("Travel time 30 to 34 min to work" = "B08303_008")
 
-all_county_df %>% dplyr::rename("Attached 1 unit building" = "B25024_003")
+all_county_df %>% dplyr::rename("Attached 1 unit building" = "B25024_002")
 
 all_county_df %>% dplyr::rename("Total Population" = "B01001_001")
 
-multi_variable_data = all_county_df %>% select(GEOID, NAME, B01001_001, B25044_009, B08006_008, B08203_007, B25034_011, B25121_106, B28011_002, C27021_001, B16001_003, B23007_002, B02001_002, B14007_017, B18103_001, B08302_005, B08303_008, B25024_003, B08203_003 ,B08203_004 ,B08203_005 ,B08203_006) %>% 
+all_county_df %>% dplyr::rename("Live outside principal city" = "B08016_013")
+multi_variable_data = all_county_df %>% select(GEOID, NAME, B01001_001, B25044_009, B08006_008, B08203_007, B25034_011, B25121_106, B28011_002, C27021_001, B16001_003, B23007_002, B02001_002, B14007_017, B18103_001, B08302_005, B08303_008, B25024_003, B08203_003 ,B08203_004 ,B08203_005 ,B08203_006, B19001_012, B08016_013) %>% 
   mutate(Renter_housing_prop = B25044_009/B01001_001) %>%
   mutate(Public_transit_work_prop = B08006_008/B01001_001) %>%
   mutate(No_home_workers_prop = B08203_007/B01001_001) %>%
   mutate(Structure_built_1939_earlier_prop = B25034_011/B01001_001) %>%
-  mutate(Household_income_over_100k_net_worth_over_500k_prop = B25121_106/B01001_001) %>%
+  mutate(Household_income_60k_to_70k_prop = B19001_012/B01001_001) %>%
   mutate(Internet_subscription_prop = B28011_002/B01001_001) %>%
   mutate(Health_insurance_coverage_prop = C27021_001/B01001_001) %>%
   mutate(Spanish_speakers_prop = B16001_003/B01001_001) %>%
@@ -118,24 +121,34 @@ multi_variable_data = all_county_df %>% select(GEOID, NAME, B01001_001, B25044_0
   mutate(Depart_work_6AM_629AM_prop = B08302_005/B01001_001) %>%
   mutate(Travel_time_work_30_to_34_mins_prop = B08303_008/B01001_001) %>%
   mutate(Attached_1_unit_building_prop = B25024_003/B01001_001) %>%
+  mutate(Lives_outside_principal_city_prop = B08016_013/B01001_001) %>%
   mutate(vehicle_ownership_prop = (B08203_003 + B08203_004 + B08203_005 + B08203_006)/ B01001_001)
 
 #multi_variable_data %>% ggplot() + geom_point(aes(x = Public_transit_work_prop , y= Structure_built_1939_earlier_prop)) #+
 #ggrepel::geom_label_repel(aes(x = Public_transit_work_prop  , y=No_home_workers_prop , label = NAME))
 
 #plotting graph vs. graph (scatterplot matrix) of all comparison graphs
-pairs(multi_variable_data %>% select(-c(NAME, GEOID)) %>% select(c(Public_transit_work_prop, No_home_workers_prop , Structure_built_1939_earlier_prop , Internet_subscription_prop ,  College_undergraduate_prop , Depart_work_6AM_629AM_prop , Travel_time_work_30_to_34_mins_prop , Attached_1_unit_building_prop)))
+pairs(multi_variable_data %>% select(-c(NAME, GEOID)) %>% select(c(Public_transit_work_prop, No_home_workers_prop , Internet_subscription_prop ,  College_undergraduate_prop , Depart_work_6AM_629AM_prop , Travel_time_work_30_to_34_mins_prop , Attached_1_unit_building_prop, Household_income_60k_to_70k_prop, Lives_outside_principal_city_prop)))
 
-model = lm(data = multi_variable_data, formula = vehicle_ownership_prop ~ Public_transit_work_prop + No_home_workers_prop + Structure_built_1939_earlier_prop + Internet_subscription_prop +  College_undergraduate_prop + Depart_work_6AM_629AM_prop + Travel_time_work_30_to_34_mins_prop + Attached_1_unit_building_prop)
+p1 = multi_variable_data %>% dplyr::filter(str_detect(NAME,"Maryland")) %>%
+  ggplot() + geom_histogram(aes(x = Household_income_60k_to_70k_prop))
+  
+p2 = multi_variable_data %>% dplyr::filter(str_detect(NAME,"Pennsylvania")) %>%
+  ggplot() + geom_histogram(aes(x = Household_income_60k_to_70k_prop))
 
-#English_only_speakers_prop
+p1 / p2
+
+model = lm(data = multi_variable_data, formula = vehicle_ownership_prop ~ Internet_subscription_prop +  College_undergraduate_prop + Depart_work_6AM_629AM_prop + Travel_time_work_30_to_34_mins_prop + Attached_1_unit_building_prop + Household_income_60k_to_70k_prop + Lives_outside_principal_city_prop + Public_transit_work_prop + Renter_housing_prop + Structure_built_1939_earlier_prop + No_home_workers_prop)
+
 summary(model)
 
 step(model)
 
-plot(model)
+data_model = step(model)
 
+plot(model)
 multi_variable_data$predict = predict(model)
+
 
 #all_county_data %>%
 #ggplot() +
@@ -144,3 +157,4 @@ multi_variable_data$predict = predict(model)
 #theme_bw()
 #plot(data=harford_dff,x=B08016_002,y=B08203_001)
 #abline(model)
+

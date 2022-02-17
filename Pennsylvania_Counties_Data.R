@@ -102,10 +102,11 @@ all_county_df %>% dplyr::rename("Travel time 30 to 34 min to work" = "B08303_008
 
 all_county_df %>% dplyr::rename("Attached 1 unit building" = "B25024_002")
 
+all_county_df %>% dplyr::rename("Live outside principal city" = "B08016_013")
+
 all_county_df %>% dplyr::rename("Total Population" = "B01001_001")
 
-all_county_df %>% dplyr::rename("Live outside principal city" = "B08016_013")
-multi_variable_data = all_county_df %>% select(GEOID, NAME, B01001_001, B25044_009, B08006_008, B08203_007, B25034_011, B25121_106, B28011_002, C27021_001, B16001_003, B23007_002, B02001_002, B14007_017, B18103_001, B08302_005, B08303_008, B25024_003, B08203_003 ,B08203_004 ,B08203_005 ,B08203_006, B19001_012, B08016_013) %>% 
+multi_variable_data = all_county_df %>% select(GEOID, NAME, B01001_001, B25044_009, B08006_008, B08203_007, B25034_011, B25121_106, B28011_002, C27021_001, B16001_003, B23007_002, B02001_002, B14007_017, B18103_001, B08302_005, B08303_008, B25024_003, B08203_003 ,B08203_004 ,B08203_005 ,B08203_006, B19001_012, B08016_013, B08203_013) %>% 
   mutate(Renter_housing_prop = B25044_009/B01001_001) %>%
   mutate(Public_transit_work_prop = B08006_008/B01001_001) %>%
   mutate(No_home_workers_prop = B08203_007/B01001_001) %>%
@@ -122,6 +123,7 @@ multi_variable_data = all_county_df %>% select(GEOID, NAME, B01001_001, B25044_0
   mutate(Travel_time_work_30_to_34_mins_prop = B08303_008/B01001_001) %>%
   mutate(Attached_1_unit_building_prop = B25024_003/B01001_001) %>%
   mutate(Lives_outside_principal_city_prop = B08016_013/B01001_001) %>%
+  mutate(One_worker_at_home_prop = B08203_013/B01001_001) %>%
   mutate(vehicle_ownership_prop = (B08203_003 + B08203_004 + B08203_005 + B08203_006)/ B01001_001)
 
 #multi_variable_data %>% ggplot() + geom_point(aes(x = Public_transit_work_prop , y= Structure_built_1939_earlier_prop)) #+
@@ -138,7 +140,7 @@ p2 = multi_variable_data %>% dplyr::filter(str_detect(NAME,"Pennsylvania")) %>%
 
 p1 / p2
 
-model = lm(data = multi_variable_data, formula = vehicle_ownership_prop ~ Internet_subscription_prop +  College_undergraduate_prop + Depart_work_6AM_629AM_prop + Travel_time_work_30_to_34_mins_prop + Attached_1_unit_building_prop + Household_income_60k_to_70k_prop + Lives_outside_principal_city_prop + Public_transit_work_prop + Renter_housing_prop + Structure_built_1939_earlier_prop + No_home_workers_prop)
+model = lm(data = multi_variable_data, formula = vehicle_ownership_prop ~ Depart_work_6AM_629AM_prop + Household_income_60k_to_70k_prop + Renter_housing_prop + Structure_built_1939_earlier_prop + One_worker_at_home_prop + College_undergraduate_prop + Travel_time_work_30_to_34_mins_prop + Public_transit_work_prop)
 
 summary(model)
 

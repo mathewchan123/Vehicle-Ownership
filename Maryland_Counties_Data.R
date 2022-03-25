@@ -9,6 +9,7 @@ library(tidyverse)
 library(tidycensus)
 library(plyr)
 library(ggplot2)
+library(ggrepel)
 library(patchwork)
 
 #Retrieves census data through use of requested API key
@@ -113,6 +114,7 @@ df_test %>%
   ggplot() + theme_bw() +
   geom_point(aes(x=pred,y=vehicle_ownership_prop)) + # plotting predicted vs actual
   geom_line(aes(x=vehicle_ownership_prop,y=vehicle_ownership_prop),color="blue",linetype=2) + # plotting actual data
+  ggrepel::geom_label_repel(aes(x=vehicle_ownership_prop,y=vehicle_ownership_prop,label = NAME,box.padding = 0.1,max.overlaps = 100000)) +
   #geom_smooth(aes(x=pred,y=vehicle_ownership_prop),color="black") + # plotting predicted vs actual
   #scale_x_continuous(limits=c(4,6),name = "Predicted") +
   #scale_y_continuous(limits=c(4,6),name = "Actual") +

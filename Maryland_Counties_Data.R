@@ -1,3 +1,9 @@
+#Script made by Mathew Chan, supervised by Richard Latham
+
+
+# Retrieving data -----------------------------------------------------
+
+
 #Loads in installed packages
 library(tidyverse)
 library(tidycensus)
@@ -40,6 +46,10 @@ df2 = get_acs(geography="county", state = "MD",variables = vars %>% select(name)
 df3 = get_acs(geography="county", state = "MD",variables = vars %>% select(name) %>% unlist() %>% unname(),year=2017,keep_geo_vars=TRUE, survey = "acs1") %>% mutate(year = 2017)
 df4 = get_acs(geography="county", state = "MD",variables = vars %>% select(name) %>% unlist() %>% unname(),year=2016,keep_geo_vars=TRUE, survey = "acs1") %>% mutate(year = 2016)
 
+
+# Manipulating data -------------------------------------------------------
+
+
 #row binds all years of data from 2016 to 2019
 all_df = df %>% 
   rbind(df2) %>%
@@ -73,7 +83,11 @@ df_train =  multi_variable_data %>% subset(year<2019) %>% select(-year)
 df_test = multi_variable_data %>% subset(year>=2019) %>% select(-year)
 
 #this line will say what variables are to be removed because of NA
-model = lm(data=df_train, vehicle_ownership_prop ~ Depart_work_6AM_629AM_prop  + Household_income_60k_to_70k_prop + Renter_housing_prop + Structure_built_1939_earlier_prop + One_worker_at_home_prop + College_undergraduate_prop + Travel_time_work_30_to_34_mins_prop + Structure_built_1939_earlier_prop)
+model = lm(data=df_train, vehicle_ownership_prop ~ Depart_work_6AM_629AM_prop  + Household_income_60k_to_70k_prop + Renter_housing_prop + Structure_built_1939_earlier_prop + One_worker_at_home_prop + College_undergraduate_prop + Travel_time_work_30_to_34_mins_prop + Structure_built_1939_earlier_prop + Vision_difficulty_prop + White_race_prop + Internet_subscription_prop)
+
+
+# Summarizing data --------------------------------------------------------
+
 
 #summary of the model
 summary(model)
@@ -99,7 +113,10 @@ df_test %>%
   ggplot() + theme_bw() +
   geom_point(aes(x=pred,y=vehicle_ownership_prop)) + # plotting predicted vs actual
   geom_line(aes(x=vehicle_ownership_prop,y=vehicle_ownership_prop),color="blue",linetype=2) + # plotting actual data
-  geom_smooth(aes(x=pred,y=vehicle_ownership_prop),color="black") + # plotting predicted vs actual
+  #geom_smooth(aes(x=pred,y=vehicle_ownership_prop),color="black") + # plotting predicted vs actual
   #scale_x_continuous(limits=c(4,6),name = "Predicted") +
   #scale_y_continuous(limits=c(4,6),name = "Actual") +
-  ggtitle("Model Performance - Predicted vs. Actual")
+  ggtitle("Model Performance - Predicted vs. Actual") + # title of plot
+  xlab("Prediction") + # x axis title
+  ylab("Proportion of Household Vehicle Ownership") # y axis title
+

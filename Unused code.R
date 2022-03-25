@@ -1,3 +1,5 @@
+#Code that is no longer being used.
+
 all_county_df %>% dplyr::rename("Renter_occupied_housing"="B25044_009")
 
 all_county_df %>% dplyr::rename("Owner_occupied_housing"="B25044_002")

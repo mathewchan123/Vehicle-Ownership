@@ -84,7 +84,7 @@ df_train =  multi_variable_data %>% subset(year<2019) %>% select(-year)
 df_test = multi_variable_data %>% subset(year>=2019) %>% select(-year)
 
 #this line will say what variables are to be removed because of NA
-model = lm(data=df_train, vehicle_ownership_prop ~ Depart_work_6AM_629AM_prop  + Household_income_60k_to_70k_prop + Renter_housing_prop + Structure_built_1939_earlier_prop + One_worker_at_home_prop + College_undergraduate_prop + Travel_time_work_30_to_34_mins_prop + Structure_built_1939_earlier_prop + Vision_difficulty_prop + White_race_prop + Internet_subscription_prop)
+model = lm(data=df_train, vehicle_ownership_prop ~ Household_income_60k_to_70k_prop +  College_undergraduate_prop + Travel_time_work_30_to_34_mins_prop + Structure_built_1939_earlier_prop + Vision_difficulty_prop + White_race_prop + Internet_subscription_prop + Attached_1_unit_building_prop)
 
 
 # Summarizing data --------------------------------------------------------
@@ -114,7 +114,7 @@ df_test %>%
   ggplot() + theme_bw() +
   geom_point(aes(x=pred,y=vehicle_ownership_prop)) + # plotting predicted vs actual
   geom_line(aes(x=vehicle_ownership_prop,y=vehicle_ownership_prop),color="blue",linetype=2) + # plotting actual data
-  ggrepel::geom_label_repel(aes(x=vehicle_ownership_prop,y=vehicle_ownership_prop,label = NAME,box.padding = 0.1,max.overlaps = 100000)) +
+  #ggrepel::geom_label_repel(aes(x=vehicle_ownership_prop,y=vehicle_ownership_prop,label = NAME)) +
   #geom_smooth(aes(x=pred,y=vehicle_ownership_prop),color="black") + # plotting predicted vs actual
   #scale_x_continuous(limits=c(4,6),name = "Predicted") +
   #scale_y_continuous(limits=c(4,6),name = "Actual") +

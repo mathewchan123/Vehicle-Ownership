@@ -77,7 +77,7 @@ multi_variable_data = all_county_df %>% select(GEOID, NAME, year, B01001_001, B2
   mutate(vehicle_ownership_prop = (B08203_003 + B08203_004 + B08203_005 + B08203_006)/ B01001_001)
 
 #Plots graph vs. graph (scatter plot matrix) of all comparison graphs
-pairs(multi_variable_data %>% select(-c(NAME, GEOID)) %>% select(c(College_undergraduate_prop, Travel_time_work_30_to_34_mins_prop, Structure_built_1939_earlier_prop, Vision_difficulty_prop, Lives_outside_principal_city_prop, White_race_prop, Internet_subscription_prop, Attached_1_unit_building_prop)))
+pairs(multi_variable_data %>% select(-c(NAME, GEOID)) %>% select(c(College_undergraduate_prop, Travel_time_work_30_to_34_mins_prop, Structure_built_1939_earlier_prop, Vision_difficulty_prop, White_race_prop, Internet_subscription_prop, Attached_1_unit_building_prop)))
 
 #Trains data
 df_train =  multi_variable_data %>% subset(year<2019) %>% select(-year)
@@ -111,7 +111,7 @@ df_test %>% select(pred, vehicle_ownership_prop, everything())
 
 #Tests correlation of individual variables in the model against vehicle ownership. x can equal any variable from the census
 df_test %>%
-  ggplot(aes(x=Internet_subscription_prop,y=vehicle_ownership_prop)) + geom_point() + geom_line() + scale_x_continuous(name = "Variable") + scale_y_continuous(name = "Vehicle Ownership")
+  ggplot(aes(x=College_undergraduate_prop,y=vehicle_ownership_prop)) + geom_point() + geom_line() + scale_x_continuous(name = "Variable") + scale_y_continuous(name = "Vehicle Ownership")
 
 #Graphs/plots predictions
 df_test %>%

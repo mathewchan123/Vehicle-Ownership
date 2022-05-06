@@ -84,29 +84,43 @@ df_train =  multi_variable_data %>% subset(year<2019) %>% select(-year)
 df_test = multi_variable_data %>% subset(year>=2019) %>% select(-year)
 
 #Creates the linear model
-model = lm(data=df_train, vehicle_ownership_prop ~ College_undergraduate_prop + Travel_time_work_30_to_34_mins_prop + Structure_built_1939_earlier_prop + Vision_difficulty_prop + White_race_prop + Internet_subscription_prop + Attached_1_unit_building_prop)
+model_initial = lm(data=df_train, vehicle_ownership_prop ~ College_undergraduate_prop + Travel_time_work_30_to_34_mins_prop + Structure_built_1939_earlier_prop + Vision_difficulty_prop + White_race_prop + Internet_subscription_prop + Attached_1_unit_building_prop + Renter_housing_prop + No_home_workers_prop + Household_income_60k_to_70k_prop + Depart_work_6AM_629AM_prop + One_worker_at_home_prop)
 
 
 # Summarizing Data --------------------------------------------------------
 
 
 #Summary of the model
-summary(model)
+summary(model_initial)
 
 #Tells total number of data that is not available in the data set (NA)
 is.na(df_test) %>% sum()
 
 #Uses backwards selection/elimination in step-wise function to finds fit of variables into model
-step(model)
+step(model_initial)
+
+#Model made as a byproduct of the step-wise function
+model_step = lm(data=df_train, vehicle_ownership_prop ~ College_undergraduate_prop + Travel_time_work_30_to_34_mins_prop + Structure_built_1939_earlier_prop + Vision_difficulty_prop + White_race_prop + Internet_subscription_prop + Attached_1_unit_building_prop)
+
+#Model of based on step-wise function
+summary(model_step)
+
+#Makes the final model (removes 2 models due to colinearity)
+model_final = lm(data=df_train, vehicle_ownership_prop ~ College_undergraduate_prop +  + Structure_built_1939_earlier_prop + Vision_difficulty_prop + White_race_prop + Internet_subscription_prop)
+
+#Summary of the final model
+summary(model_final)
+
 
 #Residual plots of model
-plot(model)
+plot(model_final)
+
 
 #Variable for prediction
-predict(model,newdata = df_test)
+predict(model_final,newdata = df_test)
 
 #Predicts the years from 2019 onward
-df_test$pred = predict(model,newdata = df_test)
+df_test$pred = predict(model_final,newdata = df_test)
 df_test %>% select(pred, vehicle_ownership_prop, everything())
 
 #Tests correlation of individual variables in the model against vehicle ownership. x can equal any variable from the census

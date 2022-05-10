@@ -131,7 +131,7 @@ df_test %>%
 df_test %>%
   ggplot() + theme_bw() +
   geom_point(aes(x=pred,y=vehicle_ownership_prop)) + # Plots predicted vs actual
-  geom_line(aes(x=vehicle_ownership_prop,y=vehicle_ownership_prop),color="blue",linetype=2) + 
+  geom_line(aes(x=pred,y=pred),color="blue",linetype=2) + 
   # Plots actual data
   #ggrepel::geom_label_repel(aes(x=vehicle_ownership_prop,y=vehicle_ownership_prop,label = NAME)) +
   #geom_smooth(aes(x=pred,y=vehicle_ownership_prop),color="black") + # plotting predicted vs actual
